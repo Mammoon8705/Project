@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Love Games Arena</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin:0;
+  font-family: Poppins, sans-serif;
+  background: linear-gradient(135deg,#ffd1dc,#ffe6f0);
+  text-align:center;
+  color:#b30059;
+}
+
+.container{
+  background:white;
+  border-radius:20px;
+  padding:25px;
+  margin:15px auto;
+  width:90%;
+  max-width:600px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
+
+.hidden{display:none;}
+
+button{
+  padding:12px 22px;
+  border:none;
+  border-radius:15px;
+  background:#ff4d6d;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  margin:10px;
+}
+
+input{
+  padding:10px;
+  width:80%;
+  margin:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+.option{
+  background:#ffe6ec;
+  padding:12px;
+  border-radius:12px;
+  margin:10px;
+  cursor:pointer;
+}
+
+.ad{
+  margin-top:15px;
+  padding:15px;
+  background:#f1f1f1;
+  border-radius:10px;
+  color:#555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="profilePage">
+<h2>❤️ Love Games Arena</h2>
+<input id="boyName" placeholder="Boy Name">
+<input id="girlName" placeholder="Girl Name">
+<br>
+<button onclick="startApp()">Start</button>
+<div class="ad">Ad Space (Google AdSense)</div>
+</div>
+
+<div class="container hidden" id="menuPage">
+<h2 id="title"></h2>
+<button onclick="openQuiz()">💌 Love Quiz</button>
+<button onclick="openHeartGame()">❤️ Heart Pop Game</button>
+<button onclick="openArrowGame()">🏹 Arrow Game</button>
+<button onclick="showResults()">📊 Results</button>
+<div class="ad">Ad Space</div>
+</div>
+
+<div class="container hidden" id="quizPage">
+<h3 id="quizQuestion"></h3>
+<div id="quizOptions"></div>
+</div>
+
+<div class="container hidden" id="heartGame">
+<h2>❤️ Heart Pop Game</h2>
+<p>Score: <span id="heartScore">0</span></p>
+<div id="heart" style="font-size:70px;cursor:pointer;">❤️</div>
+<button onclick="backMenu()">Back</button>
+</div>
+
+<div class="container hidden" id="arrowGame">
+<h2>🏹 Arrow Shooting Game</h2>
+<p>Click to shoot hearts</p>
+<p>Score: <span id="arrowScore">0</span></p>
+<div id="target" style="font-size:60px;cursor:pointer;">🎯</div>
+<button onclick="backMenu()">Back</button>
+</div>
+
+<div class="container hidden" id="resultPage">
+<h2>💖 Results</h2>
+<div id="resultData"></div>
+<button onclick="generateLink()">Generate Share Link</button>
+<br>
+<button onclick="upiPay()">Pay ₹10 for Premium Link</button>
+<button onclick="backMenu()">Back</button>
+</div>
+
+<script>
+let boy="", girl="";
+let quizIndex=0;
+let boyAnswers=[], girlAnswers=[];
+let heartScore=0, arrowScore=0;
+
+const questions=[
+["Favorite Date?",["Movie","Dinner","Trip"]],
+["Love Language?",["Words","Gifts","Time"]],
+["Dream Place?",["Beach","Mountains","City"]]
+];
+
+function startApp(){
+boy=document.getElementById("boyName").value;
+girl=document.getElementById("girlName").value;
+if(!boy||!girl){alert("Enter both names");return;}
+document.getElementById("profilePage").classList.add("hidden");
+document.getElementById("menuPage").classList.remove("hidden");
+document.getElementById("title").innerText=`${boy} ❤️ ${girl}`;
+}
+
+function openQuiz(){
+quizIndex=0;
+boyAnswers=[]; girlAnswers=[];
+document.getElementById("menuPage").classList.add("hidden");
+document.getElementById("quizPage").classList.remove("hidden");
+showQuiz();
+}
+
+function showQuiz(){
+let q=questions[quizIndex];
+document.getElementById("quizQuestion").innerText=q[0];
+let optionsDiv=document.getElementById("quizOptions");
+optionsDiv.innerHTML="";
+q[1].forEach(opt=>{
+let d=document.createElement("div");
+d.className="option";
+d.innerText=opt;
+d.onclick=()=>answer(opt);
+optionsDiv.appendChild(d);
+});
+}
+
+let turn="boy";
+
+function answer(val){
+if(turn==="boy"){
+boyAnswers.push(val);
+turn="girl";
+alert(`${girl}'s turn`);
+}else{
+girlAnswers.push(val);
+turn="boy";
+quizIndex++;
+}
+if(quizIndex<questions.length){
+showQuiz();
+}else{
+localStorage.setItem(boy+"_"+girl+"_quiz",JSON.stringify({boyAnswers,girlAnswers}));
+backMenu();
+}
+}
+
+function openHeartGame(){
+heartScore=0;
+document.getElementById("heartScore").innerText=0;
+document.getElementById("menuPage").classList.add("hidden");
+document.getElementById("heartGame").classList.remove("hidden");
+}
+
+document.getElementById("heart").onclick=()=>{
+heartScore++;
+document.getElementById("heartScore").innerText=heartScore;
+localStorage.setItem(boy+"_"+girl+"_heart",heartScore);
+};
+
+function openArrowGame(){
+arrowScore=0;
+document.getElementById("arrowScore").innerText=0;
+document.getElementById("menuPage").classList.add("hidden");
+document.getElementById("arrowGame").classList.remove("hidden");
+}
+
+document.getElementById("target").onclick=()=>{
+arrowScore++;
+document.getElementById("arrowScore").innerText=arrowScore;
+localStorage.setItem(boy+"_"+girl+"_arrow",arrowScore);
+};
+
+function showResults(){
+document.getElementById("menuPage").classList.add("hidden");
+document.getElementById("resultPage").classList.remove("hidden");
+
+let quiz=JSON.parse(localStorage.getItem(boy+"_"+girl+"_quiz"))||{};
+let heart=localStorage.getItem(boy+"_"+girl+"_heart")||0;
+let arrow=localStorage.getItem(boy+"_"+girl+"_arrow")||0;
+
+let match=0;
+if(quiz.boyAnswers){
+for(let i=0;i<quiz.boyAnswers.length;i++){
+if(quiz.boyAnswers[i]===quiz.girlAnswers[i]) match++;
+}
+}
+
+document.getElementById("resultData").innerHTML=`
+<p>Quiz Match: ${match}/${questions.length}</p>
+<p>Heart Game High Score: ${heart}</p>
+<p>Arrow Game High Score: ${arrow}</p>
+`;
+}
+
+function generateLink(){
+let link=`${location.href}?boy=${boy}&girl=${girl}&heart=${heartScore}&arrow=${arrowScore}`;
+prompt("Share this link:",link);
+}
+
+function upiPay(){
+let upiLink=`upi://pay?pa=yourupi@upi&pn=LoveGames&am=10&cu=INR&tn=${boy}_${girl}_premium`;
+window.location.href=upiLink;
+}
+
+function backMenu(){
+document.querySelectorAll(".container").forEach(c=>c.classList.add("hidden"));
+document.getElementById("menuPage").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
