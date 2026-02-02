@@ -2,241 +2,320 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Love Games Arena</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Love Games</title>
+
 <style>
+/* ===== BACKGROUND + FLAMINGOS (FROM PROGRAM 1 EXACTLY) ===== */
 body {
-  margin:0;
-  font-family: Poppins, sans-serif;
-  background: linear-gradient(135deg,#ffd1dc,#ffe6f0);
-  text-align:center;
-  color:#b30059;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.container{
-  background:white;
+/* Flamingos */
+.flamingo {
+  position: absolute;
+  font-size: 40px;
+  opacity: 0.25;
+  pointer-events: none;
+  animation: fly linear infinite;
+  will-change: transform;
+}
+
+@keyframes fly {
+  from { transform: translateX(-20vw); }
+  to { transform: translateX(120vw); }
+}
+
+.f1 { top: 15%; animation-duration: 28s; }
+.f2 { top: 40%; animation-duration: 36s; font-size: 50px; }
+.f3 { top: 65%; animation-duration: 42s; opacity: 0.18; }
+.f4 { top: 30%; animation-duration: 32s; font-size: 46px; }
+.f5 { top: 80%; animation-duration: 38s; font-size: 36px; }
+
+/* Card container */
+.container {
+  background: white;
+  border-radius: 25px;
+  padding: 30px;
+  width: 90%;
+  max-width: 520px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  z-index: 2;
+  animation: fadeIn 0.5s ease;
+}
+
+.hidden { display:none; }
+
+h1,h2 { color:#b30059; }
+
+button {
+  padding:14px 28px;
+  margin-top:15px;
   border-radius:20px;
-  padding:25px;
-  margin:15px auto;
-  width:90%;
-  max-width:600px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.15);
-}
-
-.hidden{display:none;}
-
-button{
-  padding:12px 22px;
   border:none;
-  border-radius:15px;
+  font-size:17px;
+  cursor:pointer;
+  font-weight:bold;
   background:#ff4d6d;
   color:white;
-  font-size:16px;
-  cursor:pointer;
-  margin:10px;
 }
 
-input{
-  padding:10px;
-  width:80%;
-  margin:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px;
-}
-
-.option{
-  background:#ffe6ec;
+input {
   padding:12px;
   border-radius:12px;
+  border:1px solid #ccc;
+  width:80%;
   margin:10px;
+}
+
+.option {
+  background:#ffe6ec;
+  border-radius:15px;
+  padding:14px;
+  margin:10px 0;
   cursor:pointer;
 }
 
-.ad{
-  margin-top:15px;
-  padding:15px;
-  background:#f1f1f1;
-  border-radius:10px;
-  color:#555;
+@keyframes fadeIn {
+  from { opacity:0; transform:scale(0.96);}
+  to { opacity:1; transform:scale(1);}
+}
+
+/* ===== HEART GAME STYLES (FROM PROGRAM 2) ===== */
+#heart {
+  position:absolute;
+  font-size:70px;
+  cursor:pointer;
+  user-select:none;
+}
+
+#gameOver { display:none; font-size:26px; color:#ff006e; }
+
+.explode {
+  animation: explode 0.6s forwards;
+}
+
+@keyframes explode {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(2); }
+  100% { transform: scale(0); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
+<!-- Flamingos -->
+<div class="flamingo f1">🦩</div>
+<div class="flamingo f2">🦩</div>
+<div class="flamingo f3">🦩</div>
+<div class="flamingo f4">🦩</div>
+<div class="flamingo f5">🦩</div>
+
+<!-- PROFILE PAGE -->
 <div class="container" id="profilePage">
-<h2>❤️ Love Games Arena</h2>
-<input id="boyName" placeholder="Boy Name">
-<input id="girlName" placeholder="Girl Name">
-<br>
-<button onclick="startApp()">Start</button>
-<div class="ad">Ad Space (Google AdSense)</div>
+  <h1>Love Games</h1>
+  <input id="boyName" placeholder="Boy Name">
+  <input id="girlName" placeholder="Girl Name">
+  <br>
+  <button onclick="startApp()">Start</button>
 </div>
 
+<!-- MENU PAGE -->
 <div class="container hidden" id="menuPage">
-<h2 id="title"></h2>
-<button onclick="openQuiz()">💌 Love Quiz</button>
-<button onclick="openHeartGame()">❤️ Heart Pop Game</button>
-<button onclick="openArrowGame()">🏹 Arrow Game</button>
-<button onclick="showResults()">📊 Results</button>
-<div class="ad">Ad Space</div>
+  <h2 id="title"></h2>
+  <button onclick="startQuiz()">💌 Love Quiz</button>
+  <button onclick="startHeartGame()">❤️ Heart Game</button>
 </div>
 
-<div class="container hidden" id="quizPage">
-<h3 id="quizQuestion"></h3>
-<div id="quizOptions"></div>
+<!-- QUIZ GAME (COPIED FROM PROGRAM 1 AS IS) -->
+<div class="container hidden" id="game">
+  <h2 id="question"></h2>
+  <div id="options"></div>
 </div>
 
+<div class="container hidden" id="final">
+  <h2>Your Valentine Choices</h2>
+  <div id="plan"></div>
+</div>
+
+<!-- HEART GAME (FROM PROGRAM 2) -->
 <div class="container hidden" id="heartGame">
-<h2>❤️ Heart Pop Game</h2>
-<p>Score: <span id="heartScore">0</span></p>
-<div id="heart" style="font-size:70px;cursor:pointer;">❤️</div>
+<h2>❤️ Love Chase</h2>
+Score: <span id="score">0</span> |
+Lives: <span id="lives">3</span> |
+Level: <span id="level">1</span><br>
+High Score: <span id="highScore">0</span>
+
+<div id="message">Catch the heart to spread love 💕</div>
+<div id="heart">❤️</div>
+<div id="gameOver"></div>
+<button onclick="restartGame()" id="restartBtn" style="display:none;">Restart</button>
 <button onclick="backMenu()">Back</button>
 </div>
 
-<div class="container hidden" id="arrowGame">
-<h2>🏹 Arrow Shooting Game</h2>
-<p>Click to shoot hearts</p>
-<p>Score: <span id="arrowScore">0</span></p>
-<div id="target" style="font-size:60px;cursor:pointer;">🎯</div>
-<button onclick="backMenu()">Back</button>
-</div>
+<audio id="bgMusic" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
 
-<div class="container hidden" id="resultPage">
-<h2>💖 Results</h2>
-<div id="resultData"></div>
-<button onclick="generateLink()">Generate Share Link</button>
-<br>
-<button onclick="upiPay()">Pay ₹10 for Premium Link</button>
-<button onclick="backMenu()">Back</button>
-</div>
+<audio id="loseSound">
+  <source src="lose.mp3" type="audio/mpeg">
+</audio>
 
 <script>
+/* ===== GLOBAL NAMES ===== */
 let boy="", girl="";
-let quizIndex=0;
-let boyAnswers=[], girlAnswers=[];
-let heartScore=0, arrowScore=0;
-
-const questions=[
-["Favorite Date?",["Movie","Dinner","Trip"]],
-["Love Language?",["Words","Gifts","Time"]],
-["Dream Place?",["Beach","Mountains","City"]]
-];
 
 function startApp(){
 boy=document.getElementById("boyName").value;
 girl=document.getElementById("girlName").value;
 if(!boy||!girl){alert("Enter both names");return;}
-document.getElementById("profilePage").classList.add("hidden");
-document.getElementById("menuPage").classList.remove("hidden");
-document.getElementById("title").innerText=`${boy} ❤️ ${girl}`;
+profilePage.classList.add("hidden");
+menuPage.classList.remove("hidden");
+title.innerText = boy+" ❤️ "+girl;
 }
 
-function openQuiz(){
-quizIndex=0;
-boyAnswers=[]; girlAnswers=[];
-document.getElementById("menuPage").classList.add("hidden");
-document.getElementById("quizPage").classList.remove("hidden");
-showQuiz();
+/* ===== QUIZ CODE FROM PROGRAM 1 ===== */
+const game = document.getElementById("game");
+const finalPage = document.getElementById("final");
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const planEl = document.getElementById("plan");
+
+let itinerary = {};
+let currentQuestion = 0;
+
+const questions = [
+  ["Flowers","Roses or Tulips?",["Roses","Tulips"]],
+  ["Gift","Chocolate gift or Teddy bear?",["Chocolate gift","Teddy bear"]],
+  ["Dinner","Candlelight dinner or Pizza + movie night?",["Candlelight dinner","Pizza + movie night"]],
+];
+
+function startQuiz(){
+menuPage.classList.add("hidden");
+game.classList.remove("hidden");
+currentQuestion=0;
+itinerary={};
+showQuestion();
 }
 
-function showQuiz(){
-let q=questions[quizIndex];
-document.getElementById("quizQuestion").innerText=q[0];
-let optionsDiv=document.getElementById("quizOptions");
-optionsDiv.innerHTML="";
-q[1].forEach(opt=>{
-let d=document.createElement("div");
-d.className="option";
-d.innerText=opt;
-d.onclick=()=>answer(opt);
-optionsDiv.appendChild(d);
+function showQuestion(){
+const [key,text,opts]=questions[currentQuestion];
+questionEl.textContent=text;
+optionsEl.innerHTML="";
+opts.forEach(opt=>{
+const div=document.createElement("div");
+div.className="option";
+div.textContent=opt;
+div.onclick=()=>selectOption(key,opt);
+optionsEl.appendChild(div);
 });
 }
 
-let turn="boy";
-
-function answer(val){
-if(turn==="boy"){
-boyAnswers.push(val);
-turn="girl";
-alert(`${girl}'s turn`);
-}else{
-girlAnswers.push(val);
-turn="boy";
-quizIndex++;
-}
-if(quizIndex<questions.length){
-showQuiz();
-}else{
-localStorage.setItem(boy+"_"+girl+"_quiz",JSON.stringify({boyAnswers,girlAnswers}));
-backMenu();
-}
+function selectOption(key,value){
+itinerary[key]=value;
+currentQuestion++;
+if(currentQuestion<questions.length){showQuestion();}
+else{showFinal();}
 }
 
-function openHeartGame(){
-heartScore=0;
-document.getElementById("heartScore").innerText=0;
-document.getElementById("menuPage").classList.add("hidden");
-document.getElementById("heartGame").classList.remove("hidden");
+function showFinal(){
+game.classList.add("hidden");
+finalPage.classList.remove("hidden");
+planEl.innerHTML=Object.entries(itinerary)
+.map(([k,v])=>`<p><strong>${k}:</strong> ${v}</p>`).join("");
 }
 
-document.getElementById("heart").onclick=()=>{
-heartScore++;
-document.getElementById("heartScore").innerText=heartScore;
-localStorage.setItem(boy+"_"+girl+"_heart",heartScore);
-};
+/* ===== HEART GAME FROM PROGRAM 2 ===== */
+let score,lives,level,speed,fallSpeed,gravityInterval;
+let musicStarted=false;
 
-function openArrowGame(){
-arrowScore=0;
-document.getElementById("arrowScore").innerText=0;
-document.getElementById("menuPage").classList.add("hidden");
-document.getElementById("arrowGame").classList.remove("hidden");
+const heart=document.getElementById("heart");
+const gameOverText=document.getElementById("gameOver");
+const messageBox=document.getElementById("message");
+const bgMusic=document.getElementById("bgMusic");
+const loseSound=document.getElementById("loseSound");
+
+let highScore=localStorage.getItem("highScore")||0;
+document.getElementById("highScore").innerText=highScore;
+
+function startHeartGame(){
+menuPage.classList.add("hidden");
+heartGame.classList.remove("hidden");
+startGame();
 }
 
-document.getElementById("target").onclick=()=>{
-arrowScore++;
-document.getElementById("arrowScore").innerText=arrowScore;
-localStorage.setItem(boy+"_"+girl+"_arrow",arrowScore);
-};
+function startGame(){
+score=0; lives=3; level=1; speed=0.5; fallSpeed=2;
+document.getElementById("score").innerText=score;
+document.getElementById("lives").innerText=lives;
+document.getElementById("level").innerText=level;
+gameOverText.style.display="none";
+restartBtn.style.display="none";
+musicStarted=false;
+bgMusic.pause(); bgMusic.currentTime=0;
+moveHeart();
+gravityInterval=setInterval(gravity,40);
+}
 
-function showResults(){
-document.getElementById("menuPage").classList.add("hidden");
-document.getElementById("resultPage").classList.remove("hidden");
+function moveHeart(){
+let x=Math.random()*(window.innerWidth-80);
+let y=Math.random()*(window.innerHeight/3);
+heart.style.left=x+"px";
+heart.style.top=y+"px";
+}
 
-let quiz=JSON.parse(localStorage.getItem(boy+"_"+girl+"_quiz"))||{};
-let heart=localStorage.getItem(boy+"_"+girl+"_heart")||0;
-let arrow=localStorage.getItem(boy+"_"+girl+"_arrow")||0;
+heart.onclick=hitHeart;
 
-let match=0;
-if(quiz.boyAnswers){
-for(let i=0;i<quiz.boyAnswers.length;i++){
-if(quiz.boyAnswers[i]===quiz.girlAnswers[i]) match++;
+function hitHeart(){
+if(!musicStarted){bgMusic.play();musicStarted=true;}
+score++;
+document.getElementById("score").innerText=score;
+moveHeart();
+}
+
+function gravity(){
+let top=heart.offsetTop;
+heart.style.top=top+fallSpeed+"px";
+if(heart.offsetTop+heart.offsetHeight>=window.innerHeight){
+loseLife();
 }
 }
 
-document.getElementById("resultData").innerHTML=`
-<p>Quiz Match: ${match}/${questions.length}</p>
-<p>Heart Game High Score: ${heart}</p>
-<p>Arrow Game High Score: ${arrow}</p>
-`;
+function loseLife(){
+loseSound.play();
+lives--;
+document.getElementById("lives").innerText=lives;
+if(lives<=0){endGame();}
+else{moveHeart();}
 }
 
-function generateLink(){
-let link=`${location.href}?boy=${boy}&girl=${girl}&heart=${heartScore}&arrow=${arrowScore}`;
-prompt("Share this link:",link);
+function endGame(){
+clearInterval(gravityInterval);
+bgMusic.pause();
+heart.classList.add("explode");
+gameOverText.style.display="block";
+gameOverText.innerText="Game Over!";
+restartBtn.style.display="inline-block";
 }
 
-function upiPay(){
-let upiLink=`upi://pay?pa=yourupi@upi&pn=LoveGames&am=10&cu=INR&tn=${boy}_${girl}_premium`;
-window.location.href=upiLink;
+function restartGame(){
+heart.classList.remove("explode");
+startGame();
 }
 
 function backMenu(){
 document.querySelectorAll(".container").forEach(c=>c.classList.add("hidden"));
-document.getElementById("menuPage").classList.remove("hidden");
+menuPage.classList.remove("hidden");
 }
 </script>
 
